@@ -14,6 +14,9 @@ Flow → Control loop or Data flow
 2. What are RL environments and how to build them _by Nvidia and Unsloth_ https://unsloth.ai/blog/rl-environments
 
 ## Tally RL Env
+
+[mid stop due to unclarity]
+
 ### Tally Reference Resources
 - https://help.tallysolutions.com/developer-reference/
 - https://unsloth.ai/blog/rl-environments
