@@ -1,6 +1,5 @@
 _Environment count is becomes a dominant scaling axis for post-training. Frontiers models are gettoing trained in multiple environments_
 
-
 ### Three-tier taxonomy
 1. **(Tier 1) Pure task libraries:** provide just problems plus verifiers - RLVE, Reasoning Gym. No transport, no tools, no state. These are not environments in the operational sense; they're datasets with grading functions.
 2. **(Tier 2) Environment frameworks:** define how to build an environment but expect you to bring your own trainer — OpenEnv, ORS, NeMo Gym, RL-Factory. 

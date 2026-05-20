@@ -1,11 +1,24 @@
-# Tally Prime RL Env
+# Handson On Reinforcement Learning Environment
 
-## Helpful references
-https://help.tallysolutions.com/developer-reference/
-https://unsloth.ai/blog/rl-environments
-https://docs.nvidia.com/nemo/gym/latest/environment-tutorials/index.html
+"Hands-on implementation of foundational RL environments on control loops, agent-environment interactions, API structures, and state-action interactions.
 
-## Existing Tally's ai solution and integration (MANUAL RESEARCH)
+```
+Ports → APIs or Interfaces
+
+Flow → Control loop or Data flow
+```
+
+### Resources
+1. The ultimate guide to RL environments: building and scaling them in the LLM era _by HuggingFace_ https://huggingface.co/spaces/AdithyaSK/rl-environments-guide
+2. What are RL environments and how to build them _by Nvidia and Unsloth_ https://unsloth.ai/blog/rl-environments
+
+## Tally RL Env
+### Tally Reference Resources
+- https://help.tallysolutions.com/developer-reference/
+- https://unsloth.ai/blog/rl-environments
+- https://docs.nvidia.com/nemo/gym/latest/environment-tutorials/index.html
+
+### Existing Tally's ai solution and integration (MANUAL RESEARCH)
 1. `LucaGPT`: _**Simplify Tally Prime Workflow with AI-Powered Accounting.**_ LucaGPT quickly turns documents, voice, and text into accurate TallyPrime records. Save time, avoid errors, and manage your accounts easily with secure, AI-powered automation.
 2. `AI Accountant`: Connect Tally to a secure cloud dashboard to eliminate repetitive exports, reduce manual work, and unlock real time insights.
 Automate GST coding and compliance with intelligent rules

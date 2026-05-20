@@ -1,6 +1,5 @@
 """
-confirm (1) the .env loads, (2) the HF token authenticates,
-(3) a remote model replies
+confirm (1) the .env loads, (2) the HF token authenticates, (3) a remote model replies
 """
 
 import os
