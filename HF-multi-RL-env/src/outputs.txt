@@ -1,0 +1,129 @@
+1. `math_env.py`:
+
+----------
+TASK Q1-> Natalia sold 48 clips in April and half as many in May. How many clips did she sell in total?
+  gold = 72  |  predicted = 72  |  reward = 1.0
+
+----------
+TASK Q2-> A robe takes 2 bolts of blue fiber and half that much white fiber. How many bolts in total?
+  gold = 3  |  predicted = 3  |  reward = 1.0
+
+----------
+TASK Q3-> Weng earns $12 per hour for babysitting. Yesterday she babysat for 50 minutes. How much did she earn in dollars?
+  gold = 10  |  predicted = 10  |  reward = 1.0
+
+----------
+TASK Q4-> Betty has half the money she needs for a $100 wallet. Her parents give her $15 and her grandparents twice as much as her parents. How much more does she need?
+  gold = 5  |  predicted = 5  |  reward = 1.0
+
+----------
+TASK Q5-> James writes a 3-page letter to 2 different friends twice a week. How many pages does he write in a year (52 weeks)?
+  gold = 624  |  predicted = 624  |  reward = 1.0
+
+==========
+SUMMARY: 5 / 5 solved!  (mean reward 1.00)
+
+
+2. `wordle_env.py`
+
+(✓) guess function sanity test pass!
+
+----------
+TASK w1: secret = CRANE
+  turn 1: ARISE -> YGRRG
+  turn 2: CRANE -> GGGGG
+  -> SOLVED in 2 turns | reward = 0.9
+
+----------
+TASK w2: secret = MONEY
+  turn 1: ARISE -> RRRRY
+  turn 2: TOKEN -> RGRGY
+  turn 3: NOBLE -> YGRRY
+  turn 4: GUESS -> RRYRR
+  turn 5: BASED -> RRRGR
+  turn 6: MONEY -> GGGGG
+  -> SOLVED in 6 turns | reward = 0.5
+
+----------
+TASK w3: secret = PLANT
+  turn 1: ARISE -> YRRRR
+  turn 2: ADAPT -> RRGYG
+  turn 3: PLANT -> GGGGG
+  -> SOLVED in 3 turns | reward = 0.8
+
+----------
+TASK w4: secret = BRAVE
+  turn 1: ARISE -> YGRRG
+  turn 2: CRANE -> RGGRG
+  turn 3: BRAKE -> GGGRG
+  turn 4: BRAVE -> GGGGG
+  -> SOLVED in 4 turns | reward = 0.7
+
+----------
+TASK w5: secret = LIGHT
+  turn 1: ARISE -> RRYRR
+  turn 2: PILOT -> RGYRG
+  turn 3: LIMIT -> GGRRG
+  turn 4: LIGHT -> GGGGG
+  -> SOLVED in 4 turns | reward = 0.7
+
+==========
+SUMMARY: 5/5 solved | mean reward 0.72
+
+
+3. `envs_evaluations.py`
+COLLECTING FROM: Environment A — math
+----------
+  ✓ Q1: 1 turn(s), reward 1.0
+  ✓ Q2: 1 turn(s), reward 1.0
+  ✓ Q3: 1 turn(s), reward 1.0
+  ✓ Q4: 1 turn(s), reward 1.0
+  ✓ Q5: 1 turn(s), reward 1.0
+  mean reward: 1.00
+
+COLLECTING FROM: Environment B — Wordle
+----------
+  turn 1: ARISE -> YGRRG
+  turn 2: CRANE -> GGGGG
+  ✓ w1: 2 turn(s), reward 0.9
+  turn 1: ARISE -> RRRRY
+  turn 2: TOKEN -> RGRGY
+  turn 3: NOBLE -> YGRRY
+  turn 4: MONEY -> GGGGG
+  ✓ w2: 4 turn(s), reward 0.7
+  turn 1: ARISE -> YRRRR
+  turn 2: ADAPT -> RRGYG
+  turn 3: PLANT -> GGGGG
+  ✓ w3: 3 turn(s), reward 0.8
+  turn 1: ARISE -> YGRRG
+  turn 2: CRANE -> RGGRG
+  turn 3: BRAKE -> GGGRG
+  turn 4: BRACE -> GGGRG
+  turn 5: BRAVE -> GGGGG
+  ✓ w4: 5 turn(s), reward 0.6
+  turn 1: ARISE -> RRYRR
+  turn 2: RRYRR -> RRRRR
+  turn 3: GUESS -> YRRRR
+  turn 4: BASED -> RRRRR
+  turn 5: RIGID -> RGGRR
+  turn 6: NIGHT -> RGGGG
+  · w5: 6 turn(s), reward 0.54
+  mean reward: 0.71
+
+————————————————————————————————————————————————————————————————————
+SIDE-BY-SIDE: the same 12 components, two fillings
+————————————————————————————————————————————————————————————————————
+|  Component        |  Env A (math)       |  Env B (Wordle)         |
+|  Tasks            |  question + answer  |  secret word            |
+|  Prompt           |  static question    |  history + constraints  |
+|  Harness          |  chat() x1          |  chat() in a loop       |
+|  Tool / Action    |  none               |  score_guess each turn  |
+|  Observation      |  none               |  feedback + constraints |
+|  State            |  none               |  history across turns   |
+|  Termination      |  after 1 reply      |  GGGGG or 6 turns       |
+|  Reward           |  0/1 exact-match    |  shaped, graded         |
+|  Episode control  |  trainer (1 step)   |  trainer (the loop)     |
+————————————————————————————————————————————————————————————————————
+
+KEY INSIGHT: the collector above ran BOTH envs through the same
+rollout() -> reward interface. Single-turn is the loop with one

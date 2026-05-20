@@ -1,11 +1,9 @@
 # shared/llm.py
 """
-The single point where our code talks to a remote model.
-Everything else in the project imports `chat` from here.
+Single point for calling llm for actions (The "harness" components A.T. paper's five-stage spine)
 
-This is the "harness" boundary in the paper's five-stage spine:
 Tasks -> [Harness] -> Reward -> Rollout -> Trainer
-The harness is just "how the model gets called". That's all it is.
+The harness is just "how the model gets called".
 
 Three backends:
 "hf" 

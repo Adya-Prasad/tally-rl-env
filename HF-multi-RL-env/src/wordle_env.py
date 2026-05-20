@@ -1,33 +1,28 @@
 r"""
 MULTI-TURN WORDE ENVIRONMENT (2):
+Worlde env (used in PAPER) utilising multiple RL env components:
 
-This is Env A's skeleton with THREE slots filled in that were empty
-before:
   - TOOL          : guess(word) -> feedback        (the model's action)
   - OBSERVATION   : the feedback string the model reads back
   - STATE         : the secret word + guess history, persisted across turns
 
-Plus the rollout becomes a LOOP instead of a single call.
-Everything else (tasks, prompt, harness, reward) you already met in Env A.
+output:
+    TASK w1: secret = XXXXX
+    turn 1: XXXXX -> XXXXX
+    turn ...  
 """
 from llm import chat
-
-
-# THE GAME MECHANICS  ("Execution backend" — here, pure Python, no model)
-# Test this in isolation FIRST. If the scoring is wrong, no model or
-# reward function can save you. This is the paper's "validate the
-# mechanics before the rollout" rule.
 
 def score_guess(secret, guess):
     """
     Standard Wordle feedback, per letter:
-      G = right letter, right position (green)
-      Y = right letter, wrong position (yellow)
-      B = letter not in the word (black/gray)
-    Returns a 5-char string like 'GBYBB'.
+      G = right letter, right position (green 🟢)
+      Y = right letter, wrong position (yellow 🟡)
+      R = letter not in the word (red 🔴)
+    Returns a 5-char string like 'GRYRG'.
     """
     secret, guess = secret.upper(), guess.upper()
-    result = ["B"] * 5
+    result = ["R"] * 5
     secret_chars = list(secret)
 
     # First pass: greens (exact matches), and consume those letters
@@ -46,22 +41,15 @@ def score_guess(secret, guess):
 
     return "".join(result)
 
-
-# Quick mechanics self-test — run this file directly to see it.
-# (We test the BACKEND before wiring in a model. Always.)
+# Quick mechanics self-test 
 def _self_test():
     assert score_guess("CRANE", "CRANE") == "GGGGG", "exact match failed"
     assert score_guess("CRANE", "NACRE") == "YYYYG", "anagram-ish failed"
-    assert score_guess("CRANE", "ZZZZZ") == "BBBBB", "no-match failed"
-    assert score_guess("LEVEL", "EAGLE") == "YBBYY", "double-letter failed"
-    print("[ok] score_guess mechanics pass")
+    assert score_guess("CRANE", "ZZZZZ") == "RRRRR", "no-match failed"
+    assert score_guess("EAGLE", "LEGAL") == "YYGYR", "double-letter failed"
+    print("(✓) guess function sanity test pass!")
 
-
-# %% -------------------------------------------------------------------
-# COMPONENT 1: TASKS  — each task is just a secret word to guess.
-# (Compare to Env A where a task was question+answer. Same idea,
-#  different shape. The paper's translation table in action.)
-# ----------------------------------------------------------------------
+# COMPONENT 1: TASKS (a secret word to guess)
 TASKS = [
     {"id": "w1", "secret": "CRANE"},
     {"id": "w2", "secret": "MONEY"},
@@ -70,17 +58,13 @@ TASKS = [
     {"id": "w5", "secret": "LIGHT"},
 ]
 
-MAX_TURNS = 6  # COMPONENT 5: termination — Wordle gives 6 guesses.
+MAX_TURNS = 6  # COMPONENT 5: termination condition
 
-
-# %% -------------------------------------------------------------------
-# COMPONENT 2: PROMPT  — how we present the game + history to the model.
-# Note this prompt INCLUDES the running history. That history IS the
-# "observation" being fed back each turn. The model is stateless; WE
-# carry the state and re-show it every turn.
+# COMPONENT 2: PROMPT (how we present the game + history to the model)
+# Prompt INCLUDES the running history. History is "observation" being fed back each turn.
+# The model is stateless; carry the state and re-show it every turn.
 def summarize_constraints(history):
-    """Turn raw feedback into explicit constraints the model can reason over.
-    This is OBSERVATION ENGINEERING: same information, made legible."""
+    """Turn raw feedback into explicit constraints the model can reason over."""
     greens = ["_"] * 5            # confirmed position
     musts = set()                 # letters that must appear (yellow somewhere)
     nopes = set()                 # letters confirmed absent (black everywhere)
@@ -138,14 +122,9 @@ def parse_guess(reply):
     return m.group(1).upper() if m else None
 
 
-# %% -------------------------------------------------------------------
-# COMPONENT 4: REWARD — graded, not just 0/1.
-# Solving fast is better than solving slow. This is a SHAPED reward:
-# it gives the (hypothetical) trainer a richer signal than pass/fail.
-# The paper's "dense vs sparse" axis — this is on the denser side.
+# COMPONENT 4: REWARD — graded (denser side)
 def compute_reward(solved, turns_used, history):
-    """Shaped/dense reward. Rewards GOOD PLAY, not just winning, so the
-    signal isn't all-or-nothing (the paper's dense-vs-sparse axis)."""
+    """Shaped/dense reward. Rewards GOOD PLAY"""
     if solved:
         return round(1.0 - 0.1 * (turns_used - 1), 2)   # solving still best
     # partial credit: progress + valid exploration, even on a loss
@@ -154,17 +133,13 @@ def compute_reward(solved, turns_used, history):
     best_greens = max((fb.count("G") for _, fb in history), default=0) / 5
     return round(0.3 * unique_ratio + 0.3 * best_greens, 2)
 
-# %% -------------------------------------------------------------------
-# THE ROLLOUT — now a LOOP. This is the heart of multi-turn.
-# Compare line-by-line to Env A's rollout(): same five components,
-# but wrapped in a while-loop with STATE (history) carried across turns.
-# ----------------------------------------------------------------------
+
+# THE ROLLOUT (A LOOP for multi-turn)
 def rollout(task, verbose=True):
     secret = task["secret"]
     history = []            # COMPONENT 3 (state): persists across turns
     solved = False
-    trajectory = []         # full record of the episode, for reading later
-
+    trajectory = []     
     for turn in range(1, MAX_TURNS + 1):
         # 1. model reads observation (history), produces an action
         messages = build_messages(history)
@@ -201,15 +176,15 @@ def rollout(task, verbose=True):
         "solved": solved,
         "turns_used": len(history),
         "reward": reward,
-        "trajectory": trajectory,   # the full multi-turn record
+        "trajectory": trajectory, 
     }
 
 if __name__ == "__main__":
-    _self_test()   # validate mechanics BEFORE any model call
+    _self_test()   
 
     results = []
     for task in TASKS:
-        print(f"\n{'='*60}\nTASK {task['id']}: secret = {task['secret']}")
+        print(f"\n{'-'*10}\nTASK {task['id']}: secret = {task['secret']}")
         res = rollout(task)
         status = "SOLVED" if res["solved"] else "failed"
         print(f"  -> {status} in {res['turns_used']} turns | reward = {res['reward']}")
@@ -217,12 +192,14 @@ if __name__ == "__main__":
 
     solved_count = sum(r["solved"] for r in results)
     mean_reward = sum(r["reward"] for r in results) / len(results)
-    print(f"\n{'='*60}")
+    print(f"\n{'='*10}")
     print(f"SUMMARY: {solved_count}/{len(results)} solved | mean reward {mean_reward:.2f}")
 
 
-# FINDINGS
+# FINDINGS:
 
-# This is exactly the paper's pitfall list, two entries at once: "observation format the model can't parse / act on well" and the deeper one — your reward gives no signal for the behavior you actually care about. You reward solving. You give zero signal for "made a valid new guess that respects the feedback." So from the model's point of view, repeating BASED and guessing a fresh word are worth the same: nothing, until it happens to win. That's a sparse-reward dead zone — the thing the paper warns kills training signal.
-# This is the lesson. You did not find a bad model. You found an under-specified environment. And you found it by reading trajectories, exactly as the paper insists — "the biggest mistakes in RL env design are caught by reading 5 trajectories, not by 1000 training steps." You just lived that sentence.
-# Before (raw observation, sparse reward): 0/5 solved, mean reward 0.00, model stuck repeating BASED four times in a row. After (sharpened observation, shaped reward): 4/5 solved, mean reward 0.69, and not a single repeated guess anywhere in the output. Same model, same secret words, same loop. The only thing that changed was the environment — the observation got more legible and the reward got denser.
+# PAPER's Listed pitfalls: two entries at once (model repeat the guess) - "observation format the model can't parse / act on well" and the deeper one. The reward gives no signal for the behavior we actually care about. Give zero signal for "made a valid new guess that respects the feedback." So from the model's point of view, repeating BASED and guessing a fresh word are worth the same: nothing, until it happens to win. That's a sparse-reward dead zone — the thing the paper warns kills training signal.
+
+# We built an under-specified environment. And it get revealed by reading trajectories, exactly as the paper insists — "the biggest mistakes in RL env design are caught by reading 5 trajectories, not by 1000 training steps."
+
+# BEFORE (raw observation, sparse reward): 0/5 solved, mean reward 0.00, model stuck repeating BASED four times in a row. AFTER (sharpened observation, shaped reward): 4/5 solved, mean reward 0.69, and not a single repeated guess anywhere in the output. Due to change in env the observation got more legible and the reward got denser.
