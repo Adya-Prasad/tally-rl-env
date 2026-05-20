@@ -1,0 +1,10 @@
+[project]
+name = "hf-multi-rl-env"
+version = "0.1.0"
+description = "HuggingFace 'he ultimate guide to RL environments: building and scaling them in the LLM era' inspired multi RL environments script"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=2.37.0",
+    "python-dotenv>=1.2.2",
+]

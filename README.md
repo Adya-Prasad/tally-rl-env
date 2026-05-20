@@ -12,11 +12,3 @@ Automate GST coding and compliance with intelligent rules
 3. `Tara`: **Tara provides a complete financial operating system for Tally.** Automated Data Entry, Actionable Intelligence, WhatsApp integration, TallyPrime data synced to the cloud, and real time dashboard 
 3. `_Aslam Bari_` : On LinkedIn he talk about **Introducing the First-Ever AI Agent for Tally Prime**
 
-
-### My open questions:
-
-`Intent Towards Applied AI Research?`
-1. What will be the scope of RL Env for Tally Prime? (like any of the above)
-2. Who RL agent will work with tally, automate UI spatial performance or ai integration?
-3. Does `env` is going to be **gym** or what?
-4. Does mentioned _RL for spatial reasoning_ is realed to this for understanding semantic spatial structures, object manipulation, dealing with GUI: forms, labels and inputs?
