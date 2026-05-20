@@ -10,6 +10,7 @@ Flow → Control loop or Data flow
 
 ### Resources
 1. [PAPER] The ultimate guide to RL environments: building and scaling them in the LLM era _by HuggingFace_ https://huggingface.co/spaces/AdithyaSK/rl-environments-guide
+3. Paper companion code: https://github.com/adithya-s-k/RL_Envs_101
 2. What are RL environments and how to build them _by Nvidia and Unsloth_ https://unsloth.ai/blog/rl-environments
 
 ## Tally RL Env
